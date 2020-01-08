@@ -54,7 +54,7 @@ RUN apt-get update && \
     curl -L -o /usr/local/bin/kubectl -LO https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl && \
     chmod +x /usr/local/bin/kubectl
 COPY hack/ssh_known_hosts /etc/ssh/ssh_known_hosts
-COPY --from=builder /usr/local/bin/docker /usr/local/bin/
+COPY --from=builder /usr/local/bin/docker /usr/local/bin/s
 
 
 ####################################################################################################
@@ -67,10 +67,14 @@ FROM builder as argo-build
 COPY Gopkg.toml ${GOPATH}/src/dummy/Gopkg.toml
 COPY Gopkg.lock ${GOPATH}/src/dummy/Gopkg.lock
 
-RUN cd ${GOPATH}/src/dummy && \
-    dep ensure -vendor-only && \
-    mv vendor/* ${GOPATH}/src/ && \
-    rmdir vendor
+ADD vendor ${GOPATH}/src/
+
+
+
+#RUN cd ${GOPATH}/src/dummy && \
+#    dep ensure -vendor-only && \
+#    mv vendor/* ${GOPATH}/src/ && \
+#    rmdir vendor
 
 # Perform the build
 WORKDIR /go/src/github.com/argoproj/argo
